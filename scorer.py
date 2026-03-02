@@ -1,54 +1,49 @@
-import os
-import json
-from openai import OpenAI
+import numpy as np
 
-# Make sure you set your API key as an environment variable:
-# Mac/Linux:
-# export OPENAI_API_KEY="your_key_here"
-# Windows:
-# setx OPENAI_API_KEY "your_key_here"
-
-client = OpenAI()
-
-def find_viral_moments(segments):
-    full_text = ""
-    for seg in segments:
-        full_text += seg["text"] + "\n"
-
-    prompt = f"""
-You are a viral short-form content strategist.
-
-From this transcript, select 5 highly engaging 30-60 second clips.
-
-Rules:
-- Strong hook at the start
-- Emotional or controversial moments preferred
-- High curiosity factor
-- Return ONLY valid JSON
-
-Format:
-[
-  {{"start": 10, "end": 55}},
-  {{"start": 120, "end": 165}}
+# Words that usually signal strong engagement
+VIRAL_KEYWORDS = [
+    "crazy", "insane", "unbelievable", "shocking",
+    "never", "worst", "best", "secret", "exposed",
+    "why", "how", "truth", "mistake", "dangerous"
 ]
 
-Transcript:
-{full_text}
-"""
+def score_segment(segment):
+    text = segment["text"].lower()
+    duration = segment["end"] - segment["start"]
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7
-    )
+    score = 0
 
-    content = response.choices[0].message.content.strip()
+    # Keyword scoring
+    for word in VIRAL_KEYWORDS:
+        if word in text:
+            score += 3
 
-    try:
-        moments = json.loads(content)
-    except json.JSONDecodeError:
-        print("AI response was not valid JSON. Printing raw output:")
-        print(content)
-        raise
+    # Question / exclamation scoring
+    score += text.count("?") * 2
+    score += text.count("!") * 2
 
-    return moments
+    # Speed spike (fast speech = intensity)
+    words = len(text.split())
+    if duration > 0:
+        words_per_second = words / duration
+        score += words_per_second
+
+    return score
+
+
+def find_viral_moments(segments):
+    scored = []
+
+    for seg in segments:
+        s = score_segment(seg)
+        scored.append({
+            "start": seg["start"],
+            "end": seg["end"],
+            "score": s
+        })
+
+    # Sort by score descending
+    scored = sorted(scored, key=lambda x: x["score"], reverse=True)
+
+    # Return top 5
+    return scored[:5]
