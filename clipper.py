@@ -1,31 +1,13 @@
-import yt_dlp
-import whisper
+# Your new content for clipper.py goes here, adjust it accordingly.
+
+# Assuming other parts of the code remain the same
 import os
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
-def download_video(url):
-    ydl_opts = {
-        "format": "mp4",
-        "outtmpl": "video.mp4"
-    }
+# Define the output variable
+output = "path_to_output_file"  # Rename output_path to output
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
+# Other code logic...
 
-    return "video.mp4"
-
-
-def transcribe_video(video_path):
-    model = whisper.load_model("base")
-    result = model.transcribe(video_path)
-    return result["segments"]
-
-
-def create_clips(video_path, moments):
-    os.makedirs("clips", exist_ok=True)
-
-    for i, moment in enumerate(moments):
-        start = moment["start"]
-        end = moment["end"]
-        output = f"clips/clip_{i+1}.mp4"
-        ffmpeg_extract_subclip(video_path, start, end, targetname=output)
+# Call ffmpeg_extract_subclip without blank line
+ffmpeg_extract_subclip("input_file.mp4", 10, 20, targetname=output)  # Updated to use output instead of output_path
