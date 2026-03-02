@@ -2,3 +2,9 @@ app.py
 main.py
 clipper.py
 scorer.py
+streamlit
+openai-whisper
+yt-dlp
+moviepy
+ffmpeg-python
+numpy
