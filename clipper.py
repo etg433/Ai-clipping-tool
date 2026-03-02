@@ -10,4 +10,4 @@ output = "path_to_output_file"  # Rename output_path to output
 # Other code logic...
 
 # Call ffmpeg_extract_subclip without blank line
-ffmpeg_extract_subclip("input_file.mp4", 10, 20, target_name=output)
+ffmpeg_extract_subclip("input_file.mp4", 10, 20, targetname=output)
