@@ -27,6 +27,5 @@ def create_clips(video_path, moments):
     for i, moment in enumerate(moments):
         start = moment["start"]
         end = moment["end"]
-
-        output_path = f"clips/clip_{i+1}.mp4"
-        ffmpeg_extract_subclip(video_path, start, end, targetname=output_path)
+        output = f"clips/clip_{i+1}.mp4"
+        ffmpeg_extract_subclip(video_path, start, end, targetname=output)
